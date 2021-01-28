@@ -37,6 +37,12 @@ def get_all_patient(table):
 
 
 def search_patient(table, query_params):
+    """
+    query_params structure:
+        {
+        id: id of patient record
+        }
+    """
     if not isinstance(query_params, dict):
         query_params = query_params.to_dict()
     response = search(table=table, query_params=query_params)
@@ -118,6 +124,12 @@ def update_patient(table, source):
 
 
 def delete_patient(table, source):
+    """
+    source structure:
+        {
+            id: id of patient record to be deleted
+        }
+    """
     id = source.get("id")
     if id is None:
         return {

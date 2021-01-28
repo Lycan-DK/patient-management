@@ -128,7 +128,8 @@ class TestPatient(unittest.TestCase):
         }
         created_patient = add_patient(table=self.table, source=payload)
 
-        # Get list of patient and get id for patient to updated
-        list_of_patients = get_all_patient(table=self.table)
-        id = list_of_patients.get("Items")[0].get("id")
+        # get patient id from message
+        message = created_patient.get("message")
+        split = message.split('id :')
+        id = split[1]
         return id

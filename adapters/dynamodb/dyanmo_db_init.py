@@ -3,7 +3,7 @@ import boto3
 
 class DynamoDBInit:
     """
-    This class is sued for creating dynamo DB instace that can be used at multiple places.
+    This class is used for creating dynamo DB instance that can be used at multiple places.
     """
 
     def __init__(self, config):
