@@ -1,0 +1,10 @@
+.env
+venv/
+Lib/
+Scripts/
+pyvenv.cfg
+__pycache__/
+*.db
+.serverless
+.vscode
+.idea

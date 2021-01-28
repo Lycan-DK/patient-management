@@ -1,0 +1,134 @@
+﻿schema {
+  query: Query
+  mutation: Mutation
+  subscription: Subscription
+}
+
+type Mutation {
+  createPatient(input: CreatePatientInput!): returnMessage
+  deletePatient(input: DeletePatientInput!): returnMessage
+  updatePatient(input: UpdatePatientInput!): returnMessage
+}
+
+type Query {
+  getPatient(id: ID!): patientOne
+  listPatients(filter: TablePatientFilterInput, limit: Int, nextToken: String): patientConnection
+}
+
+type Subscription {
+  onCreatePatient(age: Int, first_name: String, gender: String, id: ID, last_name: String): patient @aws_subscribe(mutations : ["createPatient"])
+}
+
+type patient {
+  age: Int!
+  country: String!
+  created_at: AWSDateTime!
+  email: String!
+  first_name: String!
+  gender: String!
+  id: ID!
+  last_name: String!
+  state: String!
+}
+
+type patientConnection {
+  Items: [patient]
+  nextToken: String
+}
+
+type patientOne {
+  Item: patient
+}
+
+type returnMessage {
+  message: String
+  status: Int
+}
+
+input CreatePatientInput {
+  age: Int!
+  country: String!
+  email: String!
+  first_name: String!
+  gender: String!
+  last_name: String!
+  state: String!
+}
+
+input DeletePatientInput {
+  id: ID!
+}
+
+input TableBooleanFilterInput {
+  eq: Boolean
+  ne: Boolean
+}
+
+input TableFloatFilterInput {
+  between: [Float]
+  contains: Float
+  eq: Float
+  ge: Float
+  gt: Float
+  le: Float
+  lt: Float
+  ne: Float
+  notContains: Float
+}
+
+input TableIDFilterInput {
+  beginsWith: ID
+  between: [ID]
+  contains: ID
+  eq: ID
+  ge: ID
+  gt: ID
+  le: ID
+  lt: ID
+  ne: ID
+  notContains: ID
+}
+
+input TableIntFilterInput {
+  between: [Int]
+  contains: Int
+  eq: Int
+  ge: Int
+  gt: Int
+  le: Int
+  lt: Int
+  ne: Int
+  notContains: Int
+}
+
+input TablePatientFilterInput {
+  age: TableIntFilterInput
+  country: TableStringFilterInput
+  created_at: TableStringFilterInput
+  email: TableStringFilterInput
+  first_name: TableStringFilterInput
+  gender: TableStringFilterInput
+  id: TableIDFilterInput
+  last_name: TableStringFilterInput
+  state: TableStringFilterInput
+}
+
+input TableStringFilterInput {
+  beginsWith: String
+  between: [String]
+  contains: String
+  eq: String
+  ge: String
+  gt: String
+  le: String
+  lt: String
+  ne: String
+  notContains: String
+}
+
+input UpdatePatientInput {
+  age: Int
+  first_name: String
+  id: ID!
+  last_name: String
+}

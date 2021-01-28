@@ -1,0 +1,100 @@
+service: appsync-services
+
+plugins:
+   - serverless-appsync-plugin
+   - serverless-python-requirements
+   - serverless-pseudo-parameters
+
+provider:
+  name: aws
+  runtime: python3.8
+  region: 'us-east-2' # add region
+  profile: 'newAdmin' # add user profile name here
+  environment:
+    DYNAMODB_TABLE: testPatientData1
+
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "dynamodb:*"
+        - "kms:*"
+      Resource: "arn:aws:dynamodb:#{AWS::Region}:*:table/testPatientData1"
+
+custom:
+  pythonRequirements:
+    dockerizePip: true    
+  APPSYNC_TABLE: appsync-table
+  appSync:
+    name:  appsync
+    schema: entrypoints/graphql/schema.graphql
+    authenticationType: API_KEY
+    mappingTemplatesLocation: entrypoints/graphql/mapping_templates
+    mappingTemplates:
+      - dataSource: GraphQLResolver
+        type: Query
+        field: getPatient
+        request: getPatient-request-mapping-template.vtl
+        response: common-response-mapping-template.vtl
+      - dataSource: GraphQLResolver
+        type: Query
+        field: listPatients
+        request: listPatients-request-mapping-template.vtl
+        response: common-response-mapping-template.vtl
+      - dataSource: GraphQLResolver
+        type: Mutation
+        field: createPatient
+        request: createPatient-request-mapping-template.vtl
+        response: common-response-mapping-template.vtl
+      - dataSource: GraphQLResolver
+        type: Mutation
+        field: deletePatient
+        request: deletePatient-request-mapping-template.vtl
+        response: common-response-mapping-template.vtl
+      - dataSource: GraphQLResolver
+        type: Mutation
+        field: updatePatient
+        request: updatePatient-request-mapping-template.vtl
+        response: common-response-mapping-template.vtl
+    dataSources:
+      - type: AWS_LAMBDA
+        name: GraphQLResolver
+        description: 'Lambda DataSource'
+        config:
+          lambdaFunctionArn: { "Fn::GetAtt": [GraphQLResolverLambdaFunction, Arn] } 
+          
+
+package:
+  individually: true
+
+functions:
+  GraphQLResolver:
+    handler: entrypoints/events/patient_lambda_handler.lambda_handler
+    package:
+      exclude: 
+        - entrypoints/graphql/**
+        - entrypoints/rest/**
+        - compose/**
+        - tests/**
+        - venv/**
+        - env.keys
+      include:
+        - entrypoints/events/**
+        - services/**
+        - adapters/**
+        - utils/**
+
+resources:
+  Resources:
+    GraphQLResolverLambdaFunction:
+      Type: AWS::Lambda::Function
+    AppsyncTable:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        BillingMode: PAY_PER_REQUEST
+        TableName: testPatientData1
